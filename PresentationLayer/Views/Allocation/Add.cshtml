@@ -1,0 +1,262 @@
+﻿@using PresentationLayer.ViewModels
+@model AllocationViewModel
+<div class="container w-100 d-flex justify-content-center align-items-center" style="margin-top: 25px;">
+    <div class="row h-100">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card" style="border-radius: 15px; width: 800px;">
+                <div class="card-body p-5">
+                    <h2 class="text-uppercase text-center mb-4">Add Allocation</h2>
+                    <form>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="LevelId" class="control-label">Levels</label>
+                                    <select id="LevelDropdown" asp-for="LevelId" class="form-control" asp-items="Model.Levels">
+                                        <option value="">-Select Level Of Experience-</option>
+                                    </select>
+                                    <span id="LevelDropdownError" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="PositionId" class="control-label">Positions</label>
+                                    <select id="PositionDropdown" asp-for="PositionId" class="form-control" asp-items="Model.Positions">
+                                        <option value="">-Select Position-</option>
+                                    </select>
+                                    <span id="PositionDropdownError" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class=" col-md-6">
+                                <div class="dropdown">
+                                    <label class="control-label fw-bold">Employee</label>
+                                    <select class="col-sm-12 col-form-label fs-5 fw-bold" disabled><option>Select Employee</option></select>
+                                    <div class="dropdown-content" id="EmployeeList">
+                                    </div>
+                                    <span id="EmployeeListError" class="text-danger"></span>
+                                </div>
+                            </div>
+
+
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ProjectId" class="control-label fw-bold">Project</label>
+                                    <select asp-for="ProjectId" class="form-control" asp-items="Model.Projects"></select>
+                                    <span id="ProjectIdError" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="col-form-label fw-bold">Allocation Percentage</label>
+                                    <input type="number" asp-for="AllocationPercentage" min="25" max="100" class="form-control" />
+                                    <span id="AllocationPercentageError" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="col-form-label fw-bold">Start Date</label>
+                                    <input type="date" asp-for="StartDate" class="form-control" />
+                                    <span id="StartDateError" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="col-form-label fw-bold">End Date</label>
+                                    <input type="date" asp-for="EndDate" class="form-control" />
+                                    <span id="EndDateError" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3 text-center">
+                            <input type="button" onclick="submitForm()" class="btn btn-primary btn-lg custom-button" value="Submit" />
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        attachChangeHandler('#ProjectId');
+        attachChangeHandler('#LevelDropdown');
+        attachChangeHandler('#EmployeeList');
+        attachChangeHandler('#PositionDropdown');
+        attachChangeHandler('#AllocationPercentage');
+        attachChangeHandler('#StartDate');
+        attachChangeHandler('#EndDate');
+
+        $('#LevelDropdown, #PositionDropdown').change(function () {
+            var levelId = $('#LevelDropdown').val();
+            var positionId = $('#PositionDropdown').val();
+
+            $.ajax({
+                url: '@Url.Action("getEmployees", "Allocation")',
+                type: 'GET',
+                data: {
+                    levelId: levelId,
+                    positionId: positionId
+                },
+
+                success: function (data) {
+                    var employeeDropdown = $('#EmployeeList');
+                    employeeDropdown.empty();
+                    // employeeDropdown.append('<option value="">-Select Employee-</option>');
+
+                    $.each(data, function (index, item) {
+                        employeeDropdown.append(`<label><input type="checkbox" name="employees" value="${item.value}">${item.text}</label>`);
+
+                    });
+                    //emloyeeDropdown.prop('disabled', data.length === 0); // Disable if no employees found
+                    
+                },
+
+                error: function () {
+                    alert("An error occurred while loading employees.");
+                }
+            });
+        });
+    });
+
+    function submitForm() {
+        var selectedEmployee = document.querySelectorAll('input[name="employees"]:checked');
+        var employees = [];
+        if(selectedEmployee.length == 0) {
+            validateField('#EmployeeList', 'You should choose at least one employee.');
+        }
+        for (var i = 0; i < selectedEmployee.length; i++) {
+            employees.push(parseInt(selectedEmployee[i].value));
+        }
+
+        let isValid = false;
+        var selectedProject = $('#ProjectId').val();
+        var levelIdValue = $('#LevelDropdown').val();
+        var positionIdValue = $('#PositionDropdown').val();
+        var allocationPercentageValue = $('#AllocationPercentage').val();
+        var startDateValue = $('#StartDate').val();
+        var endDateValue = $('#EndDate').val();
+
+        isValid = validateField('#ProjectId', 'Project is required');
+        isValid = validateField('#LevelDropdown', 'Level is required');
+        isValid = validateField('#PositionDropdown', 'Position is required');
+        isValid = validateField('#AllocationPercentage', 'Allocation percentage is required');
+        isValid = validateField('#StartDate', 'Start date is required');
+        isValid = validateField('#EndDate', 'End date is required');
+
+        if (!isValid) {
+            return false;
+        }
+
+        $.ajax({
+            url: "/Allocation/Add",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Employees: employees,
+                projectId: parseInt(selectedProject),
+                LevelId: parseInt(levelIdValue),
+                PositionId: parseInt(positionIdValue),
+                AllocationPercentage: parseInt(allocationPercentageValue),
+                StartDate: startDateValue,
+                EndDate: endDateValue
+            }),
+            dataType: "json",
+           
+            success: function (response) {
+                window.location = '/Allocation/Index';
+            },
+            error: function (xhr, status, error) {
+                console.log("Error" + error);
+            }
+        });
+
+    }
+
+    function validateField(selector, errorMessage) {
+        var value = $(selector).val();
+        if (!value) {
+            $(selector).addClass('is-invalid');
+            $(selector + 'Error').text(errorMessage);
+            return false;
+        } else {
+            $(selector).removeClass('is-invalid');
+            $(selector + 'Error').text('');
+            return true;
+        }
+    }
+
+    function addError(selector, errorMessage) {
+        $(selector).addClass('is-invalid');
+        $(selector + 'Error').text(errorMessage);
+    }
+
+    function attachChangeHandler(selector) {
+        $(selector).on('change input', function () {
+            validateField(selector, ''); // Passing an empty message to clear the error
+        });
+    }
+</script>
+
+<style>
+    .custom-button {
+        width: 200px; /* Set your desired width */
+        height: 45px; /* Set your desired height */
+        font-size: 1.3rem; /* Adjust font size */
+        text-align: center; /* Center text */
+    }
+
+    .card {
+        margin: auto; /* Center the card */
+        max-width: 800px; /* Limit card width */
+        width: 100%; /* Allow card to be responsive */
+    }
+
+    .form-control {
+        height: 45px; /* Keep a consistent height */
+    }
+
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+        .dropdown-content label {
+            display: block;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>
+
+
+
+
+
+
+
+

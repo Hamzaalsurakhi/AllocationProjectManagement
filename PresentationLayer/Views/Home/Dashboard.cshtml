@@ -1,0 +1,332 @@
+﻿@model PresentationLayer.ViewModels.DashboardViewModel
+@{
+    ViewBag.Title = "Dashboard";
+
+}
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+<div class="container-fluid mt-5 mb-5">
+    <div class="row">
+        <!-- Total Projects Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="fs-6 font-weight-bold text-primary  mb-1">
+                                # Projects
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-gray-800">@Model.totalOfProject</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-project-diagram fa-2x " style="color: #b1cfef"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Employees Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="fs-6 font-weight-bold text-primary  mb-1">
+                                # Employees
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-gray-800">@Model.totalOfEmployee</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x" style="color: #b1cfef"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bench Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="fs-6 font-weight-bold text-primary mb-1">
+                                Bench
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-gray-800">@Model.NumberOfEmployeeInBench</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chair fa-2x" style="color: #b1cfef"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shared Resource Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="fs-6 font-weight-bold text-primary mb-1">
+                                Shared Resource
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-gray-800">@Model.sharedResource</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-share fa-2x" style="color: #b1cfef"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Doughnut Chart Section -->
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card h-100">
+                <!-- Header at the top -->
+                <div class="card-header pb-3 brc-secondary-l3">
+                    <h6 class="card-title   mb-2 mb-md-0 font-weight-bold text-css-primary">
+                        Projects
+                    </h6>
+                </div>
+                <div class="card-body h-100 d-flex flex-column justify-content-between">
+                    <!-- Centered canvas in the remaining space -->
+                    <div class="d-flex justify-content-center align-items-center flex-grow-1">
+                        <canvas id="statusChart" style="max-height:400px; max-width:400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card w-100 h-100">
+                <!-- Card header -->
+                <div class="card-header pb-3 brc-secondary-l3">
+                    <h6 class="card-title  mb-2 mb-md-0 font-weight-bold text-css-primary">
+                        Employees About To Become Bench
+                    </h6>
+                </div>
+                <!-- Card body -->
+                <div class="card-body p-0" style="padding-right:0;padding-left:0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var employee in Model.EmployeesBecomeBench)
+                        {
+                            var img = Url.Content($"~/File/{employee.PhotoURL}");
+                            var timeDiff = employee.TimeDifference;
+                            var formattedTime = $"{(int)timeDiff.Value.TotalDays}d {timeDiff.Value.Hours}h {timeDiff.Value.Minutes}m {timeDiff.Value.Seconds}s";
+                            var totalSeconds = (int)timeDiff.Value.TotalSeconds;
+                            if (totalSeconds > 0)
+                            {
+                                <li class="list-group-item d-flex align-items-center py-3">
+                                    <img alt="@employee.PhotoURL's avatar" src="@img" class="rounded-circle me-3" style="width: 40px; height: 40px;">
+                                    <div class="row d-flex w-100 justify-content-between align-items-center" style="margin-left:5px">
+                                        <span class="col-4 font-weight-bold text-css-secondary">@employee.FirstName @employee.LastName</span>
+                                        <div class="col-4 d-flex justify-content-start align-items-start flex-column">
+                                            <span class="badge bg-CSS-info mb-1 text-white fst-normal" style="margin-right:3px">@employee.PositionName</span>
+                                            <span class="badge bg-CSS-info text-white fst-normal">@employee.LevelName</span>
+                                        </div>
+                                        <div class="col-4 d-flex justify-content-end align-items-center">
+                                            <span class="countdown-timer text-css-secondary" data-seconds="@totalSeconds" style="margin-right: 3px; font-size: 13px">@formattedTime</span>
+                                            <i class="fa fa-clock text-css-info"></i>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="card-header text-center p-2 brc-secondary-l3">
+                    <a asp-controller="Home" asp-action="Bench" class="card-title text-decoration-line-through mb-2 mb-md-0 text-muted" style="font-size:12px">
+                        View All Employees is Bench
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Add this new section for Stacked Bar Chart -->
+    <div class="row">
+        <div class="col-lg-12 col-md-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header pb-3 brc-secondary-l3">
+                    <h6 class="card-title mb-2 mb-md-0 font-weight-bold text-css-primary">
+                        Employee Distribution By Projects
+                    </h6>
+                </div>
+                <div class="card-body h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-center align-items-center flex-grow-1">
+                        <canvas id="stackedBarChart" style="max-height:500px; max-width:900px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Include Chart.js and ChartDataLabels -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let barChart;
+        function fetchChartData(startDate, endDate) {
+            return fetch('/Home/GetFilteredProjects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ startDate: startDate, endDate: endDate })
+            })
+                .then(response => response.json())
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Doughnut Chart for Project Statuses
+        const statusLabels = @Html.Raw(Json.Serialize(Model.ProjectStatusCounts.Keys));
+        const statusData = @Html.Raw(Json.Serialize(Model.ProjectStatusCounts.Values));
+
+        if (statusLabels.length > 0 && statusData.length > 0) {
+            const totalStatusesCount = statusData.reduce((a, b) => a + b, 0);
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        label: 'Project Statuses',
+                        data: statusData,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 99, 132, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const percentage = ((tooltipItem.raw / totalStatusesCount) * 100).toFixed(2);
+                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' (' + percentage + '%)';
+                                }
+                            }
+                        },
+                        datalabels: {
+                            formatter: (value) => {
+                                const percentage = ((value / totalStatusesCount) * 100).toFixed(2);
+                                return `${value} (${percentage}%)`;
+                            },
+                            color: '#000',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        // Stacked Bar Chart for Employee Distribution
+        $.ajax({
+            url: '@Url.Action("GetEmployeeDistributionData", "Allocation")',
+            method: 'GET',
+            success: function (data) {
+                console.log(data); // Debugging data structure
+
+                const labels = Object.keys(data);
+                const allLevels = labels.flatMap(label => Object.keys(data[label]));
+                const uniqueLevels = [...new Set(allLevels)];
+
+                const colorScheme = [
+                    'rgba(255, 99, 132, 0.2)', // Red
+                    'rgba(54, 162, 235, 0.2)', // Blue
+                    'rgba(75, 192, 192, 0.2)', // Green
+                    'rgba(255, 159, 64, 0.2)', // Orange
+                    'rgba(153, 102, 255, 0.2)'  // Purple
+                ];
+
+                const datasets = uniqueLevels.map((level, index) => ({
+                    label: level,
+                    data: labels.map(label => data[label][level] || 0),
+                    backgroundColor: colorScheme[index % colorScheme.length],
+                    borderColor: colorScheme[index % colorScheme.length].replace('0.2', '1'),
+                    borderWidth: 1
+                }));
+
+                const ctxStackedBar = document.getElementById('stackedBarChart').getContext('2d');
+                new Chart(ctxStackedBar, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                stacked: true
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return value.toFixed(0); // Ensure labels are whole numbers
+                                    },
+                                    stepSize: 1 // Increment steps by 1
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load chart data:', error);
+            }
+        });
+        const countdownTimers = document.querySelectorAll('.countdown-timer');
+
+        countdownTimers.forEach(function (timer) {
+            let totalSeconds = parseInt(timer.getAttribute('data-seconds'));
+
+            const intervalId = setInterval(function () {
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+
+                    const days = Math.floor(totalSeconds / (24 * 3600));
+                    const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    const seconds = totalSeconds % 60;
+
+                    timer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                } else {
+                    clearInterval(intervalId);
+                    timer.textContent = "Time's up!";
+                }
+            }, 1000);
+        });
+    });
+</script>

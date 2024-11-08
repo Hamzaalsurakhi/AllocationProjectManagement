@@ -1,0 +1,19 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Employee List";
+
+}
+
+@model IEnumerable<SelectListItem>
+
+@foreach (var employee in Model)
+{
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="SelectedEmployeeIds" value="@employee.Value" id="employee-@employee.Value" />
+        <label class="form-check-label" for="employee-@employee.Value">
+            @employee.Text
+        </label>
+    </div>
+}

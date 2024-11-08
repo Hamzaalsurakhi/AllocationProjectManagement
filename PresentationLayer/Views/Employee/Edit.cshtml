@@ -1,0 +1,204 @@
+﻿@using PresentationLayer.ViewModels
+@model EmployeeViewModel
+@{ 
+    ViewBag.Title = "Edit Employee";
+}
+<!-- Bootstrap CSS and Custom CSS -->
+<link href="~/startbootstrap-sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+<link href="~/css/ProfileCSS.css" rel="stylesheet" />
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-10">
+            <div class="card  mb-4">
+                <div class="card-body p-5">
+                    <h2 class="text-capitalize text-center mb-4">Edit Employee</h2>
+                    <form asp-action="Edit" class="p-3" method="post" enctype="multipart/form-data" onsubmit="return validateImage();">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="EmployeeId" />
+                        <input type="hidden" asp-for="PhotoURL" />
+                        <input type="hidden" asp-for="TotalAllocatedPercentage" />
+                        <input type="hidden" asp-for="IsBench" />
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="form-label">First Name</label>
+                                    <input asp-for="FirstName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="MidName" class="form-label">Second Name</label>
+                                    <input asp-for="MidName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="MidName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="FourthName" class="form-label">Third Name</label>
+                                    <input asp-for="FourthName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="FourthName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="form-label">Last Name</label>
+                                    <input asp-for="LastName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="Gender" class="form-label"></label>
+                                    <select asp-for="Gender" class="form-control form-control-sm">
+                                        <option value="">-Select Gender-</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-lg-6 col-12 mb-3">
+                                <label class="form-label" asp-for="Photo">Profile Picture:</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" accept="image/*" id="profileImage" asp-for="Photo" onchange="previewImage()">
+                                    <label class="custom-file-label" for="profileImage">Choose file</label>
+                                </div>
+
+                                <!-- Validation for the photo -->
+                                <span class="form-text text-danger" asp-validation-for="Photo"></span>
+                                <span id="error-message" class="form-text text-danger"></span>
+
+                                <!-- Display the current photo if it exists -->
+                                @if (!string.IsNullOrEmpty(Model.PhotoURL))
+                                    {
+                                    <p>Current Photo: @System.IO.Path.GetFileName(Model.PhotoURL)</p>
+                                    <input type="hidden" asp-for="PhotoURL" />
+                                    }
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input asp-for="Email" class="form-control form-control-sm" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="Address" class="form-label"></label>
+                                    <input asp-for="Address" class="form-control form-control-sm" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                    <input asp-for="PhoneNumber" class="form-control form-control-sm" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="PositionId" class="form-label">Employee Position</label>
+                                    <select asp-for="PositionId" class="form-control form-control-sm" asp-items="Model.Positions">
+                                        <option value="">-Select Position-</option>
+                                    </select>
+                                    <span asp-validation-for="PositionId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="LevelId" class="form-label">Employee Level</label>
+                                    <select asp-for="LevelId" class="form-control form-control-sm" asp-items="Model.Levels">
+                                        <option value="">-Select Level Of Experience-</option>
+                                    </select>
+                                    <span asp-validation-for="LevelId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="TeamCountryId" class="form-label">Team Country</label>
+                                    <select asp-for="TeamCountryId" class="form-control form-control-sm" asp-items="Model.TeamCountries">
+                                        <option value="">-Select Team Country-</option>
+                                    </select>
+                                    <span asp-validation-for="TeamCountryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group text-center mb-3 mt-5">
+                                <input type="submit" value="Update" class="btn btn-primary" />
+                                <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+           var successMessage = '@TempData["SuccessEditEmp"]';
+
+            if (successMessage) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: successMessage,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then((result) => {
+                    window.location.href = '@Url.Action("Index", "Employee")';
+                });
+            }
+        });
+
+
+
+        function previewImage() {
+            var imageInput = document.getElementById('profileImage');
+            var previewImage = document.getElementById('profileImagePreview');
+            var fileNameLabel = imageInput.nextElementSibling;
+
+            if (imageInput.files && imageInput.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                }
+                reader.readAsDataURL(imageInput.files[0]);
+
+                // Update file name in label
+                fileNameLabel.textContent = imageInput.files[0].name;
+            }
+        }
+    </script>
+}
+
+
+
+

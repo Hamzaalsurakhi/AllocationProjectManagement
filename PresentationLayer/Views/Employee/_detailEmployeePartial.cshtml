@@ -1,0 +1,116 @@
+﻿@using PresentationLayer.ViewModels
+@model DisplayEmployeeViewModel
+@{ 
+    ViewBag.Title = "Employee Details";
+
+}
+<div class="modal-header">
+    <h5 class="modal-title" id="detailModalLabel">@Model.FirstName @Model.LastName Details</h5>
+    <button type="button" class="close d-flex justify-content-center align-items-center" data-bs-dismiss="modal" aria-label="Close">
+        <i class="fa fa-close"></i>
+    </button>
+</div>
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="modal-body">
+    <section style="background-color: #eee;">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <img src="~/File/@Model.PhotoURL" alt="avatar"
+                                 class="rounded-circle img-fluid" style="width: 150px; height: 150px;">
+                            <h5 class="my-3">@Model.FirstName @Model.LastName</h5>
+                            <p class="text-muted mb-1">@Model.LevelName @Model.PositionName</p>
+                            <p class="text-muted mb-4">@Model.Address</p>
+                            <div class="d-flex justify-content-center mb-2">
+                                @* <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary">Allocate To</button> *@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4 mb-lg-0">
+                        <div class="card-body p-0">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Full Name</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">@Model.FirstName @Model.MidName @Model.FourthName @Model.LastName</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Gender</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">@Model.Gender</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Email</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">@Model.Email</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Phone</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">@Model.PhoneNumber</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Team Country</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">@Model.TeamCountry</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <div class="card mb-4 mb-md-0">
+                                <div class="card-body">
+                                    <p class="mb-4">
+                                        <span class="text-primary font-italic me-1">Assignment</span> Project Status
+                                    </p>
+                                    @if (Model.ActiveAllocations.Any())
+                                        {
+                                        @foreach (var allocation in Model.ActiveAllocations)
+                                            {
+                                            <p class="mb-1" style="font-size: .77rem;">@allocation.ProjectName</p>
+                                            <div class="progress rounded" style="height: 5px;">
+                                                <div class="progress-bar" role="progressbar" style="width: @allocation.AllocationPercentage%" aria-valuenow="@allocation.AllocationPercentage"
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            }
+                                        }
+                                    else
+                                        {
+                                        <p>No Active Allocations for this Employee</p>
+                                        }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

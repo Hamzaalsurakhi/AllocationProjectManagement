@@ -1,0 +1,246 @@
+﻿@model PresentationLayer.ViewModels.UserViewModel
+@{ 
+    ViewBag.Title = "Profile";
+
+}
+<!-- Bootstrap CSS and Custom CSS -->
+<link href="~/startbootstrap-sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+<link href="~/css/ProfileCSS.css" rel="stylesheet" />
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="container-fluid mt-5 mb-5 ">
+    <div class="row">
+        <!-- Sidebar Menu -->
+        <div class="col-md-5 col-sm-12 col-lg-3 d-flex flex-column boxPorfile1 ">
+            <div class="card account shadow mb-4">
+                <div class="card-body p-3 text-center">
+                    <div class="border-primary w-100 mb-3">
+                        @{
+                            var image = "";
+                            if (string.IsNullOrEmpty(Model.PhotoUrl))
+                                {
+                                if (Model.Gender == "male")
+                                    {
+                                    image = image + "assets/UserMale.png";
+                                    }
+                                else
+                                 if (Model.Gender == "female")
+                                    {
+                                    image = image + "assets/UserFemale.png";
+                                    }
+                                }
+                            else
+                                {
+                                image = image + "" + Model.PhotoUrl;
+                                }
+                            <img id="profileImagePreview" src="~/File/@image" alt="Profile Picture" class="imgaccount img-fluid rounded-circle" style="width: 120px; height: 120px;">
+                        }
+
+                    </div>
+                    <h5 class="card-title text-black">@Model.Fname @Model.Lname</h5>
+                    <p class="card-text text-muted">@User.Identity.Name</p>
+                </div>
+            </div>
+            <div class="list-group">
+                <a asp-action="Profile" asp-controller="Home" asp-route-userName="@User.Identity.Name" class="list-group-item bg-primary list-group-item-action active">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+                <a asp-controller="Account" asp-action="ResetPassword" class="list-group-item list-group-item-action">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Reset Password
+                </a>
+                <a asp-controller="Account" asp-action="Logout" class="list-group-item list-group-item-action text-warning">
+                    <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                </a>
+            </div>
+        </div>
+
+        <!-- Profile Form -->
+        <div class="col-md-7 col-sm-12 col-lg-9 boxPorfile2">
+            <div class="card shadow mb-4">
+                <div class="card-body p-4 mt-2 mb-2">
+                    <form asp-controller="Home" asp-action="Profile" asp-route-currentUserName="@User.Identity.Name" enctype="multipart/form-data" method="post" onsubmit="return validateImage();">
+
+                        <div class="d-flex justify-content-sm-between align-items-center w-100">
+                            <div class="row mb-3 w-100">
+                                <h4 class="col-md-12 col-lg-8 col-sm-12  col-12  card-title">Profile Information</h4>
+                                <div class="col-md-12 col-lg-5 col-sm-12 col-12 text-end w-100" style="font-size:12px">
+                                    <label class="form-label">Latest modified :</label>
+                                    @{
+                                        if (Model.CreatedOn > Model.ModifyOn)
+                                            {
+                                            <span class="text-end">@Model.CreatedOn?.ToString("yyyy-MM-dd hh:mm tt")</span>
+                                            }
+                                        else
+                                            {
+                                            <span class="text-end">@Model.ModifyOn?.ToString("yyyy-MM-dd hh:mm tt")</span>
+                                            }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12 col-lg-6 col-12">
+                                <label class="form-label" asp-for="Fname">First Name:</label>
+                                <input type="text" class="form-control" asp-for="Fname">
+                                <span class="form-text text-danger" asp-validation-for="Fname"></span>
+                            </div>
+                            <div class="col-md-12 col-lg-6  col-12">
+                                <label class="form-label" asp-for="Lname">Last Name:</label>
+                                <input type="text" class="form-control" asp-for="Lname">
+                                <span class="form-text text-danger" asp-validation-for="Lname"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-12 col-lg-6  col-12 mb-3">
+                                <label class="form-label" asp-for="ProfileImage">Profile Picture:</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" accept="image/*" id="profileImage" asp-for="ProfileImage" onchange="previewImage()">
+                                    <label class="custom-file-label" for="profileImage">Choose file</label>
+                                </div>
+                                <span class="form-text text-danger" asp-validation-for="ProfileImage"></span>
+                                <span id="error-message" class="form-text text-danger"></span>
+                            </div>
+                            <div class="col-md-12 col-lg-6  col-12">
+                                <label class="form-label" asp-for="Gender">Gender:</label>
+                                <div class="d-flex gap-4">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" asp-for="Gender" type="radio" value="male" id="flexRadioDefault1">
+                                        <label class="form-check-label" for="flexRadioDefault1">Male</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" asp-for="Gender" type="radio" value="female" id="flexRadioDefault2">
+                                        <label class="form-check-label" for="flexRadioDefault2">Female</label>
+                                    </div>
+                                </div>
+                                <span class="form-text text-danger" asp-validation-for="Gender"></span>
+                            </div>
+                        </div>
+
+                        <h4 class="card-title mt-4">Contact Information</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-12 col-lg-6  col-12">
+                                <label class="form-label" asp-for="PhoneNumber">Contact Number:</label>
+                                <input type="text" class="form-control" asp-for="PhoneNumber">
+                                <span class="form-text text-danger" asp-validation-for="PhoneNumber"></span>
+                            </div>
+                            <div class="col-md-12 col-lg-6  col-12">
+                                <label class="form-label" asp-for="UserName">Username:</label>
+                                <input type="text" class="form-control" asp-for="UserName">
+                                <span class="form-text text-danger" asp-validation-for="UserName"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12 col-12">
+                                <label class="form-label" asp-for="Email">Email Address:</label>
+                                <input type="email" class="form-control" asp-for="Email">
+                                <span class="form-text text-danger" asp-validation-for="Email"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}
+<script>
+    function validateImage() {
+        var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+        var imageInput = document.getElementById('profileImage');
+        var errorMessage = document.getElementById('error-message');
+        var previewImage = document.getElementById('profileImagePreview');
+
+        if (imageInput.files.length === 0) {
+            errorMessage.textContent = '';
+            return true;
+        }
+
+        var fileName = imageInput.value;
+        if (!allowedExtensions.exec(fileName)) {
+            errorMessage.textContent = "Only image files (jpg, jpeg, png) are allowed.";
+            return false;
+        } else {
+            errorMessage.textContent = '';
+            return true;
+        }
+    }
+
+    function previewImage() {
+        var imageInput = document.getElementById('profileImage');
+        var previewImage = document.getElementById('profileImagePreview');
+        var fileNameLabel = imageInput.nextElementSibling;
+        var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+        var errorMessage = document.getElementById('error-message');
+
+        if (imageInput.files && imageInput.files[0]) {
+            var fileName = imageInput.files[0].name;
+
+            if (!allowedExtensions.exec(fileName)) {
+                errorMessage.textContent = "Only image files (jpg, jpeg, png) are allowed.";
+                imageInput.value = '';
+                fileNameLabel.textContent = "Choose file";
+                return;
+            } else {
+                errorMessage.textContent = '';
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                }
+                reader.readAsDataURL(imageInput.files[0]);
+
+                fileNameLabel.textContent = fileName;
+            }
+        }
+    }
+
+</script>
+@* @if (TempData["UpdateAlert"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '@TempData["UpdateAlert"]',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        }).then((result) => {
+
+        });
+    </script> *@
+
+@if (TempData["UpdateAlert"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '@TempData["UpdateAlert"]',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        }).then((result) => {
+           
+        });
+    </script>
+
+
+}
+
+<script>
+    window.onload = function () {
+        document.querySelector("form").reset();
+    };
+</script>
+}
+

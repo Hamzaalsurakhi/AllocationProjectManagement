@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootswatch@5.3.3",
+      "destination": "wwwroot/lib/bootswatch/"
+    },
+    {
+      "library": "font-awesome@6.6.0",
+      "destination": "wwwroot/font-awesome/"
+    },
+    {
+      "library": "startbootstrap-sb-admin-2@4.1.4",
+      "destination": "wwwroot/startbootstrap-sb-admin-2/"
+    },
+    {
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/jquery/"
+    },
+    {
+      "library": "jquery-easing@1.4.1",
+      "destination": "wwwroot/jquery-easing/"
+    },
+    {
+      "library": "bootstrap@5.3.3",
+      "destination": "wwwroot/bootstrap/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/microsoft/signalr/"
+    }
+  ]
+}

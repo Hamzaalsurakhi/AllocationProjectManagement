@@ -1,0 +1,178 @@
+﻿@using PresentationLayer.ViewModels
+@model CreateAllocationViewModel
+
+@{
+    ViewData["Title"] = "Create Allocation";
+}
+
+<style>
+    .box {
+        border: 1px solid #ccc;
+        overflow-y: scroll; /* Adds a scrollbar if the content exceeds the box height */
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        display: flex;
+        min-height: 150px;
+        flex-wrap: wrap;
+    }
+
+    .form-check {
+        margin-right: 15px
+    }
+
+</style>
+
+<link href="~/startbootstrap-sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+<link href="~/css/ProfileCSS.css" rel="stylesheet" />
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-10">
+            <div class="card  mb-4">
+                <div class="card-body p-5">
+                    <h2 class="text-capitalize text-center mt-5 mb-3">Create Allocation</h2>
+                    <form asp-action="Create" method="post">
+                        <div class="row ">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 col-12"></div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ProjectId">Project</label>
+                                    <select asp-for="ProjectId" asp-items="Model.Projects" class="form-control" id="project-dropdown">
+                                        <option value="">-- Select Project --</option>
+                                    </select>
+                                    <span asp-validation-for="ProjectId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="LevelId">Level</label>
+                                    <select asp-for="LevelId" asp-items="Model.Levels" class="form-control" id="level-dropdown">
+                                        <option value="">-- Select Level --</option>
+                                    </select>
+                                    <span asp-validation-for="LevelId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="PositionId">Position</label>
+                                    <select asp-for="PositionId" asp-items="Model.Positions" class="form-control" id="position-dropdown">
+                                        <option value="">-- Select Position --</option>
+                                    </select>
+                                    <span asp-validation-for="PositionId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="AllocationPercentage">Allocation Percentage</label>
+                                    <select asp-for="AllocationPercentage" class="form-control" id="percentage-dropdown">
+                                        <option value="25">25%</option>
+                                        <option value="50">50%</option>
+                                        <option value="75">75%</option>
+                                        <option value="100">100%</option>
+                                    </select>
+                                    <span asp-validation-for="AllocationPercentage" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="StartDate">Start Date</label>
+                                    <input asp-for="StartDate" class="form-control" type="date" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="EndDate">End Date</label>
+                                    <input asp-for="EndDate" class="form-control" type="date" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Employees</label>
+                                    <div id="employees-list" class="box pt-3 pb-3 form-control">
+                                        <div class="w-100 mb-3">
+                                            <span class="text-gray-500 fs-6" style="font-weight:bold">Select Employees</span>
+                                            <hr class="mt-1 mb-0" />
+                                        </div>
+                                        <div id="employees-lists" class="d-flex align-items-center">
+                                            @foreach (var employee in Model.Employees)
+                                            {
+                                                <div class="form-check">
+                                                    <input class="form-check-input border-2" type="checkbox" name="SelectedEmployeeIds" value="@employee.Value" id="employee-@employee.Value" />
+                                                    <label class="form-check-label text-gray-500" for="employee-@employee.Value">
+                                                        @employee.Text
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="SelectedEmployeeIds" class="text-danger"></span>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="col-12">
+                                <div class="form-group text-center  mt-5">
+                                    <input type="submit" value="Save Changes" class="btn btn-primary" />
+                                    <a asp-controller="Allocation" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["SuccessCreate"] != null)
+    {
+
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["SuccessCreate"]',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            }).then((result) => {
+             window.location.href = '@Url.Action("Index", "Allocation")';
+            });
+        </script>
+    }
+    <script>
+        $(document).ready(function () {
+            function updateEmployees() {
+                var levelId = $("#level-dropdown").val();
+                var positionId = $("#position-dropdown").val();
+                var percentage = $("#percentage-dropdown").val();
+                var projectId = $("#project-dropdown").val();
+                $.ajax({
+                    url: '@Url.Action("GetEmployees")',
+                    data: { levelId: levelId, positionId: positionId, allocationPercentage: percentage, projectId: projectId },
+                    success: function (data) {
+                        $("#employees-lists").html(data);
+                    }
+                });
+            }
+            $("#level-dropdown").change(updateEmployees);
+            $("#position-dropdown").change(updateEmployees);
+            $("#percentage-dropdown").change(updateEmployees);
+            $("#project-dropdown").change(updateEmployees);
+
+        });
+    </script>
+}

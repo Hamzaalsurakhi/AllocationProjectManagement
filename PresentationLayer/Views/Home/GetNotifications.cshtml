@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Send Notification";
+    Layout = "../Shared/_NotificationLayout.cshtml";
+}
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<h2>Notifications</h2>
+
+<ul id="notificationList" class="list-group mt-3">
+</ul>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+            connection.on("ReceiveNotification", (title, message, createdDate) => {
+                const notificationElement = `<li class="list-group-item">
+                <strong>${title}</strong> - ${message} <br />
+                <small>${new Date(createdDate).toLocaleString()}</small>
+                </li>`;
+                $('#notificationList').prepend(notificationElement);
+            });
+
+            connection.start().catch(err => console.error(err.toString()));
+
+            $.ajax({
+                type: 'POST',
+                url: '/Home/SendNotification',
+                success: function (data) {
+                    $('#notificationList').empty();
+                    data.forEach(notification => {
+                        const notificationElement = `<li class="list-group-item">
+                        <strong>${notification.title}</strong> - ${notification.message} <br />
+                        <small>${new Date(notification.createdDate).toLocaleString()}</small>
+                        </li>`;
+                        $('#notificationList').append(notificationElement);
+                    });
+                },
+                error: function () {
+                    console.log("Error loading notifications.");
+                }
+            });
+        });
+    </script>
+}

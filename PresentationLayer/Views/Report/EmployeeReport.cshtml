@@ -1,0 +1,151 @@
+﻿<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="container-fluid w-100">
+    <div class="row justify-content-center align-items-center mt-5">
+        <h2 class="fw-bold mt-3 text-center">View Employees Report</h2>
+        <div class="col-md-10 mt-5">
+            <h5 class="mt-4">Generate and View Employees Report</h5>
+            <!-- Display error message if any -->
+            <div id="error-message" class="alert alert-danger d-none"></div>
+
+            <!-- Form for date range and search -->
+            <form id="reportForm">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control rounded-pill" />
+                            <div id="startDate-error" class="text-danger"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control rounded-pill" />
+                            <div id="endDate-error" class="text-danger"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="search" class="form-label">Search</label>
+                            <input type="text" id="search" name="search" class="form-control rounded-pill" placeholder="Search..." />
+                            <div id="search-error" class="text-danger"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="pageSize" class="form-label">Page Size</label>
+                            <select id="pageSize" name="pageSize" class="form-select rounded-pill">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-between align-items-end">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <button type="button" id="prevPageBtn" class="btn btn-primary rounded-pill">Back</button>
+                                <input type="number" style="margin-right:7px;margin-left:7px" id="page" name="page" class="form-control rounded-pill text-center" min="1" value="1" readonly />
+                                <button type="button" id="nextPageBtn" class="btn btn-primary rounded-pill">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="button" id="submitBtn" class="btn btn-primary rounded-pill">View Report</button>
+                </div>
+            </form>
+
+            <!-- Area to display the PDF -->
+            <div id="report-container" class="mt-4">
+                <iframe id="pdf-viewer" style="width: 100%; height: 600px; border: none;" class="d-none"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include jQuery and Bootstrap JS for functionality -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#submitBtn').click(function () {
+            // Clear previous errors
+            $('#error-message').addClass('d-none').text('');
+            $('#startDate-error').text('');
+            $('#endDate-error').text('');
+            $('#search-error').text('');
+
+            // Gather form data
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            var search = $('#search').val();
+            var page = $('#page').val();
+            var pageSize = $('#pageSize').val();
+
+            // Client-side validation for date range
+            if ((startDate && !endDate) || (!startDate && endDate)) {
+                $('#error-message').removeClass('d-none').text('Both Start Date and End Date must be provided together.');
+                return; // Stop further processing
+            }
+
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                $('#error-message').removeClass('d-none').text('Start Date must be less than or equal to End Date.');
+                return; // Stop further processing
+            }
+
+            var formData = {
+                startDate: startDate,
+                endDate: endDate,
+                search: search,
+                page: page,
+                pageSize: pageSize
+            };
+
+            // Make AJAX call
+            $.ajax({
+                url: '/Report/EmployeeFilterReport',
+                type: 'GET',
+                data: formData,
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (response) {
+                    // Create a URL for the PDF blob
+                    var url = URL.createObjectURL(response);
+                    $('#pdf-viewer').attr('src', url).removeClass('d-none');
+                },
+                error: function (xhr) {
+                    var errors = xhr.responseJSON;
+                    if (errors && errors.errors) {
+                        $.each(errors.errors, function (key, value) {
+                            $('#' + key + '-error').text(value.join(' '));
+                        });
+                    } else {
+                        $('#error-message').removeClass('d-none').text('An error occurred while generating the report.');
+                    }
+                }
+            });
+        });
+
+        // Handle pagination
+        $('#prevPageBtn').click(function () {
+            var currentPage = parseInt($('#page').val());
+            if (currentPage > 1) {
+                $('#page').val(currentPage - 1);
+                $('#submitBtn').trigger('click');
+            }
+        });
+
+        $('#nextPageBtn').click(function () {
+            var currentPage = parseInt($('#page').val());
+            $('#page').val(currentPage + 1);
+            $('#submitBtn').trigger('click');
+        });
+    });
+</script>

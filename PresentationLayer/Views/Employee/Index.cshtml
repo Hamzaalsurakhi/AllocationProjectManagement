@@ -1,0 +1,346 @@
+﻿
+@using PresentationLayer.ViewModels
+@model EmployeeViewModel
+<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+@{ 
+        ViewBag.Title = "Employee List";
+}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        color: #343a40;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    #dt-filter-container .form-group {
+        margin-bottom: 0;
+    }
+
+    #dt-buttons-container .btn {
+        margin: 5px;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        margin: 0px;
+        white-space: nowrap;
+        text-align: right;
+        display: flow;
+        margin-top: -26px;
+    }
+</style>
+@{
+    var isAuthenticated = User.Identity.IsAuthenticated;
+    var isHR = isAuthenticated && User.IsInRole("HR Officer");
+    var isDeleveryProject = isAuthenticated && User.IsInRole("Project Delivery Manager");
+}
+<div style="display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;" class="container-fluid mt-5">
+    <h2 class="text-muted" style="display:inline">Employees List</h2>
+    @if (isHR)
+        {
+        <a href="@Url.Action("Add", "Employee")" class="btn btn-sm btn-primary" style="float:inline-end">Add Employee</a>
+        }
+</div>
+<hr />
+<div class="container-fluid">
+
+    <div class="row mb-0 align-items-center" id="dt-filter-container">
+        <!-- Length Menu -->
+        <div class="col-md-2 mt-1" id="dt-length-container"></div>
+
+        <!-- Filters and Search -->
+        <div class="col-md-10 d-flex justify-content-end gap-3 flex-md-wrap" style="margin-top: 8px;">
+
+            <!-- Level Filter -->
+            <div class="form-group">
+                <select class="form-control form-control-sm" name="levelId" asp-items="Model.Levels" id="levelFilter" placeholder=" ">
+                    <option value="">Select Level</option>
+                </select>
+            </div>
+
+            <!-- Position Filter -->
+            <div class="form-group" style="margin: 0px 3px 0px 3px;">
+                <select class="form-control form-control-sm" name="positionId" asp-items="Model.Positions" id="positionFilter" placeholder=" ">
+                    <option value="">Select Position</option>
+                </select>
+            </div>
+
+            <!-- Search Field -->
+            <div class="form-group" id="dt-search-container"></div>
+        </div>
+    </div>
+    <!-- DataTable with Filters -->
+    <div class="row mb-2">
+        <div class="col-md-12">
+            <table id="employeeTable" class="table table-striped table-bordered dt-responsive nowrap mb-0 align-middle" style="width:100%;">
+                <thead>
+
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Position Name</th>
+                        <th>Level Name</th>
+                        <th>Total Allocation</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <div class="col-md-12 text-center">
+            <div id="dt-buttons-container"></div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="detailModal" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl mt-5">
+        <div class="modal-content">
+            <div id="detailModalContent"></div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.flash.min.js"></script>
+
+    <script>
+        var isHR = @isHR.ToString().ToLower();
+        var isDeleveryProject = @isDeleveryProject.ToString().ToLower();
+        $(document).ready(function () {
+            var dataTable = $('#employeeTable').DataTable({
+                "serverSide": true,
+                "filter": true,
+                "processing": true,
+                language: { search: "", searchPlaceholder: "Search..." },
+                "ajax": {
+                    "url": "@Url.Action("GetEmployees", "Employee")",
+                    "type": "POST",
+                    "datatype": "json",
+                    "beforeSend": function () {
+                        $('#loadingIndicator').show();
+                    },
+                    "complete": function () {
+                        $('#loadingIndicator').hide();
+                    },
+                    "data": function (d) {
+                        d.positionId = $('#positionFilter').val();
+                        d.levelId = $('#levelFilter').val();
+                    }
+                },
+                "columns": [
+                    { "data": "employeeId", "name": "EmployeeId", "autoWidth": true, "visible": false },
+                    { "data": "firstName", "name": "FirstName", "autoWidth": true },
+                    { "data": "lastName", "name": "LastName", "autoWidth": true },
+                    { "data": "email", "name": "Email", "autoWidth": true },
+                    { "data": "phoneNumber", "name": "PhoneNumber", "autoWidth": true },
+                    { "data": "positionName", "name": "PositionName", "autoWidth": true },
+                    { "data": "levelName", "name": "LevelName", "autoWidth": true },
+                    { "data": "totalAllocatedPercentage", "name": "TotalAllocatedPercentage", "autoWidth": true },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            if (isHR) {
+                                return `<a href="/Employee/Edit/${row.employeeId}"><i style="font-size:15px" class="far fa-edit"></i></a>
+                               <a href="#" class="delete-btn" data-id="${row.employeeId}"><i style="color:red; font-size:15px ; margin: 0 5px 0 5px;" class="fa fa-trash" aria-hidden="true"></i></a>
+                               <a href="#" class="" data-bs-target="#detailModal" data-bs-toggle="modal" data-employee-id="${row.employeeId}"><i style="font-size:15px;" class="fa-solid fa-eye"></i></a>`
+                            }
+                            else {
+                                return `
+                                        <a href="#" class="" data-bs-target="#detailModal" data-bs-toggle="modal" data-employee-id="${row.employeeId}"><i style="font-size:15px;margin: 0 5px 0;" class="fa-solid fa-eye"></i></a>
+                                        <a href="/Allocation/AllocationHistory/${row.employeeId}"> <i style="font-size:15px" class="fa fa-history"></i></a>
+                                        `
+
+                            }
+
+                        },
+                        "orderable": false
+                    }
+                ],
+                "scrollX": true,
+                "fixedColumns": true,
+                "responsive": true,
+                "autoWidth": false,
+                "fixedColumns": true,
+                "dom": 'Blfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: '<i class="fa fa-copy"></i> Copy',
+                        className: 'btn btn-primary',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 8;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa fa-file-csv"></i> CSV',
+                        className: 'btn btn-info',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 8;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fa fa-file-excel"></i> Excel',
+                        className: 'btn btn-success',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 8;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fa fa-file-pdf"></i> PDF',
+                        className: 'btn btn-danger',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 8;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i> Print',
+                        className: 'btn btn-warning',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 8;
+                            }
+                        }
+                    }
+                ],
+                "initComplete": function () {
+                    dataTable.buttons().container().appendTo('#dt-buttons-container');
+                    var api = this.api();
+
+                    // Move the length menu to the custom container
+                    $('#dt-length-container').append($(api.table().container()).find('.dataTables_length'));
+
+                    // Move the search bar to the custom container
+                    var searchContainer = $(api.table().container()).find('.dataTables_filter');
+                    searchContainer.removeClass('form-control-sm');
+                    $('#dt-search-container').append(searchContainer);
+
+                },
+            });
+
+
+
+            $('#positionFilter, #levelFilter').on('change', function () {
+                dataTable.draw();
+            });
+        });
+
+        $('#detailModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var employeeId = button.data('employee-id');
+            var modal = $(this);
+            $.ajax({
+                url: '@Url.Action("Details", "Employee")',
+                data: { id: employeeId },
+                success: function (data) {
+                    modal.find('#detailModalContent').html(data);
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('#employeeTable').on('click', '.delete-btn', function () {
+                var employeeId = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Are you sure you want to delete this employee?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("SoftDelete", "Employee")',
+                            type: 'POST',
+                            data: { id: employeeId },
+                            success: function (response) {
+                                if (response.hasAllocations) {
+                                    Swal.fire(
+                                        'Warning!',
+                                        response.message,
+                                        'warning'
+                                    );
+                                } else {
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'The employee has been deleted.',
+                                        'success'
+                                    ).then(() => {
+                                        $('#employeeTable').DataTable().ajax.reload();
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire(
+                                    'Error!',
+                                    'There was an issue deleting the employee.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+
+    </script>
+}
+
+

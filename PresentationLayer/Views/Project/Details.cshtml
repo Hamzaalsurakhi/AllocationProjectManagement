@@ -1,0 +1,46 @@
+﻿@model PresentationLayer.ViewModels.DisplayProjectViewModel
+@{ 
+    ViewBag.Title = "Projects Details";
+
+}
+
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+
+<h2>@Model.Name</h2>
+<p>@Model.Description</p>
+
+
+<h3>Allocations</h3>
+@if (Model.Allocations.Any())
+    {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Level</th>
+                <th>Position</th>
+                <th>Allocation Percentage</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var allocation in Model.Allocations)
+                {
+                <tr>
+                    <td>@allocation.EmployeeName</td>
+                    <td>@allocation.LevelNameEn</td>
+                    <td>@allocation.PositionNameEn</td>
+                    <td>@allocation.AllocationPercentage %</td>
+                    <td>@allocation.StartDate.ToShortDateString()</td>
+                    <td>@(allocation.EndDate?.ToShortDateString() ?? "Ongoing")</td>
+                </tr>
+                }
+        </tbody>
+    </table>
+    }
+else
+    {
+    <p>No allocations available for this project.</p>
+    }

@@ -1,0 +1,350 @@
+﻿@using PresentationLayer.ViewModels
+@model IEnumerable<DisplayProjectViewModel>
+@{
+    ViewBag.Title = "Projects List";
+
+}
+<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+<style>
+    div.dataTables_wrapper div.dataTables_filter {
+        text-align: right;
+        display: inline;
+        float: right;
+    }
+
+    .dataTables_length {
+        display: inline;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        margin: 0px;
+        white-space: nowrap;
+        text-align: right;
+        display: flow;
+        margin-top: -26px;
+    }
+
+    .modal-body {
+        max-height: 400px; /* Adjust the height based on your layout needs */
+        overflow-y: auto;
+    }
+
+    .scrollable-content {
+        max-height: 200px; /* Set a fixed height for the allocations area */
+        overflow-y: auto; /* Enable scrolling for content that exceeds the height */
+        margin-top: 15px; /* Optional: Adds some space between project details and allocations */
+    }
+</style>
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;" class="container-fluid mt-5">
+    <h2 class="text-muted" style="display:inline">Projects List</h2>
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Project Delivery Manager"))
+        {
+        <a href="@Url.Action("Create", "Project")" class="btn btn-sm btn-primary">Add Project</a>
+        }
+</div>
+<hr />
+
+<div class="container-fluid mt-4 mb-5">
+    <table id="projectTable" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <!-- DataTable Buttons Below the Table -->
+    <div class="row mb-3">
+        <div class="col-md-12 text-center">
+            <div id="dt-buttons-container"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl mt-5">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Project Details</h5>
+                <button type="button" class="close d-flex justify-content-center align-items-center" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h2 id="projectName"></h2>
+                <p id="projectDescription"></p>
+                <h3>Allocations</h3>
+
+                <!-- Scrollable container -->
+                <div id="allocationsTableContainer" class="scrollable-content"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var dataTable = $('#projectTable').DataTable({
+                "serverSide": true,
+                "filter": true,
+                "processing": true,
+                language: { search: "", searchPlaceholder: "Search..." },
+                "ajax": {
+                    "url": "@Url.Action("GetProjects", "Project")",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "name", "name": "Name", "autoWidth": true },
+
+                    {
+                        "data": "startDate",
+                        "name": "StartDate",
+                        "autoWidth": true,
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    },
+                    {
+                        "data": "endDate",
+                        "name": "EndDate",
+                        "autoWidth": true,
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    },
+                    { "data": "statusName", "name": "StatusName", "autoWidth": true },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return `
+                                        <a href="/Project/Edit/${row.projectId}" class=""><i style="font-size:15px" class="far fa-edit"></i></a>
+                                        <a href="#" class="delete-btn" data-id="${row.projectId}"><i style="color:red; font-size:15px ; margin: 0 5px 0 5px;" class="fa fa-trash" aria-hidden="true"></i></a>
+                                        <a href="#" class="" data-bs-target="#detailModal" data-bs-toggle="modal" data-project-id="${row.projectId}"><i style="font-size:15px" class="fa-solid fa-eye"></i></a>
+                                    `;
+                        },
+                        "orderable": false
+                    }
+                ],
+                "scrollX": true,
+                "responsive": true,
+                "autoWidth": false,
+                "fixedColumns": true,
+                "dom": 'Blfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: '<i class="fa fa-copy"></i> Copy',
+                        className: 'btn btn-primary',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 4;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa fa-file-csv"></i> CSV',
+                        className: 'btn btn-info',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 4;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fa fa-file-excel"></i> Excel',
+                        className: 'btn btn-success',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 4;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fa fa-file-pdf"></i> PDF',
+                        className: 'btn btn-danger',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 4;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i> Print',
+                        className: 'btn btn-warning',
+                        exportOptions: {
+                            columns: function (idx, data, node) {
+                                // Exclude the last column (Actions)
+                                return idx !== 4;
+                            }
+                        }
+                    }
+                ],
+                "initComplete": function () {
+                    dataTable.buttons().container().appendTo('#dt-buttons-container');
+                },
+            });
+
+            // Missing closure found here! Add closing brace
+        });
+    </script>
+
+    <script>
+        $('#detailModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var projectId = button.data('project-id');
+            var modal = $(this);
+
+            $.ajax({
+                url: '@Url.Action("Details", "Project")',
+                data: { id: projectId },
+                success: function (data) {
+                    modal.find('#projectName').text(data.name);
+                    modal.find('#projectDescription').text(data.description);
+
+                    var allocationsHtml = '';
+                    if (data.allocations && data.allocations.length > 0) {
+                        allocationsHtml = '<table class="table">';
+                        allocationsHtml += '<thead><tr><th>Employee Name</th><th>Level</th><th>Position</th><th>Allocation Percentage</th><th>Start Date</th><th>End Date</th></tr></thead><tbody>';
+                        $.each(data.allocations, function (i, allocation) {
+                            allocationsHtml += '<tr><td>' + allocation.employeeName + '</td><td>' + allocation.levelNameEn + '</td><td>' + allocation.positionNameEn + '</td><td>' + allocation.allocationPercentage + '%</td><td>' + new Date(allocation.startDate).toLocaleDateString() + '</td><td>' + (allocation.endDate ? new Date(allocation.endDate).toLocaleDateString() : 'Ongoing') + '</td></tr>';
+                        });
+                        allocationsHtml += '</tbody></table>';
+                    } else {
+                        allocationsHtml = '<p>No allocations available for this project.</p>';
+                    }
+
+                    modal.find('#allocationsTableContainer').html(allocationsHtml);
+                },
+                error: function () {
+                    Swal.fire(
+                        'Error!',
+                        'There was an issue fetching project details.',
+                        'error'
+                    );
+                },
+
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Handle delete button click
+            $('#projectTable').on('click', '.delete-btn', function () {
+                var projectId = $(this).data('id');
+
+                // First, make an AJAX request to check if the project has allocations
+                $.ajax({
+                    url: '@Url.Action("CheckProjectAllocations", "Project")', // Using the new action
+                    type: 'POST',
+                    data: { id: projectId },
+                    success: function (response) {
+                        if (response.hasAllocations) {
+                            // If the project has allocations, show a warning first
+                            Swal.fire({
+                                title: 'Warning!',
+                                text: 'This project has allocations. Deleting it will also delete all associated allocations. Do you want to continue?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, delete everything!',
+                                cancelButtonText: 'Cancel'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // User confirmed, now proceed with deletion
+                                    deleteProject(projectId);
+                                }
+                            });
+                        } else {
+                            // If the project doesn't have allocations, show the normal confirmation
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: "You won't be able to revert this!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, delete it!',
+                                cancelButtonText: 'Cancel'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Proceed with deletion
+                                    deleteProject(projectId);
+                                }
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Error!',
+                            'There was an issue checking project allocations.',
+                            'error'
+                        );
+                    }
+                });
+            });
+
+            // Function to handle actual project deletion
+            function deleteProject(projectId) {
+                $.ajax({
+                    url: '@Url.Action("DeleteConfirmed", "Project")',
+                    type: 'POST',
+                    data: { id: projectId },
+                    success: function (response) {
+                        Swal.fire(
+                            'Deleted!',
+                            'The project has been deleted.',
+                            'success'
+                        ).then(() => {
+                            // Reload the data table after successful deletion
+                            $('#projectTable').DataTable().ajax.reload();
+                        });
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Error!',
+                            'There was an issue deleting the project.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+

@@ -1,0 +1,107 @@
+﻿@model PresentationLayer.ViewModels.ProjectViewModel
+
+
+
+@{
+    ViewData["Title"] = "Create Project";
+}
+<link href="~/startbootstrap-sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+<link href="~/css/ProfileCSS.css" rel="stylesheet" />
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-10">
+            <div class="card mb-4">
+                <div class="card-body p-5">
+                            <h2 class="text-capitalize text-center mt-5 mb-3">Create a Project</h2>
+
+                        <form id="createProjectForm" method="post" asp-prevent-default="true" data-url="@Url.Action("Create", "Project")">
+                                <div class="row">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Name"></label>
+                                            <input asp-for="Name" class="form-control" />
+                                            <span asp-validation-for="Name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="StatusId">Status</label>
+                                            <select asp-for="StatusId" asp-items="Model.Statuses" class="form-control">
+                                                <option value="">Select Status</option>
+                                            </select>
+                                            <span asp-validation-for="StatusId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="StartDate">Start Date</label>
+                                            <input asp-for="StartDate" class="form-control" type="date" />
+                                            <span asp-validation-for="StartDate" value="" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="EndDate">End Date</label>
+                                            <input asp-for="EndDate" class="form-control" type="date" />
+                                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label asp-for="Description"></label>
+                                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                                            <span asp-validation-for="Description" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-group text-center mt-5">
+                                            <input type="submit" value="Create" class="btn btn-primary" />
+                                            <a asp-controller="Project" asp-action="ShowProjects" class="btn btn-secondary">Cancel</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["SuccessCreate"] != null)
+        {
+        <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '@TempData["SuccessCreate"]',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        }).then((result) => {
+           window.location.href = '@Url.Action("ShowProjects", "Project")';
+        });
+        </script>
+
+
+        }
+
+        <script>
+        window.onload = function () {
+            document.querySelector("form").reset();
+        };
+        </script>
+}
+
+
+

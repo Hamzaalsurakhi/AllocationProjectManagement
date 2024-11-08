@@ -1,0 +1,114 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model PresentationLayer.ViewModels.CreateAllocationViewModel
+
+
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-10">
+            <div class="card  mb-4">
+                <div class="card-body">
+                    <h2 class="text-center mt-5 mb-3">Create allocation</h2>
+
+                    <form asp-action="CreateBenchAllocation" method="post">
+                        <input type="hidden" asp-for="SelectedEmployeeIds[0]" />
+                        <input type="hidden" asp-for="LevelId" />
+                        <input type="hidden" asp-for="PositionId" />
+                        <input type="hidden" asp-for="EmployeeName" />
+                <div class="row ">
+                    <div class="col-12 col-md-4">
+                        <div class="form-group">
+                            <label>Employee Name</label>
+                            <input class="form-control" value="@Model.EmployeeName" readonly />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="form-group">
+                            <label>Level Name</label>
+                            <input class="form-control" value="@Model.LevelName" readonly />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="form-group">
+                            <label>Position Name</label>
+                            <input class="form-control" value="@Model.PositionName" readonly />
+                        </div>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ProjectId">Project</label>
+                                <select asp-for="ProjectId" asp-items="Model.Projects" class="form-control" id="project-dropdown">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                                <span asp-validation-for="ProjectId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label asp-for="AllocationPercentage">Allocation Percentage</label>
+                                <select asp-for="AllocationPercentage" class="form-control" id="percentage-dropdown">
+                                    <option value="25">25%</option>
+                                    <option value="50">50%</option>
+                                    <option value="75">75%</option>
+                                    <option value="100">100%</option>
+                                </select>
+                                <span asp-validation-for="AllocationPercentage" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input asp-for="StartDate" class="form-control" type="date" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input asp-for="EndDate" class="form-control" type="date" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                        </div>
+                    </div>
+                        <button type="submit" class="btn btn-primary">Allocate</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                    
+
+
+
+
+
+
+@section Scripts{
+    
+    @if (TempData["SuccessCreateAllocation"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["SuccessCreateAllocation"]',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            }).then((result) => {
+
+            });
+        </script>
+    }
+    
+}

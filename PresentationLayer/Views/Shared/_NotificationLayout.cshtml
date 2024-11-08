@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="~/css/ProjectColor.css" rel="stylesheet" />
+    <title>@ViewBag.Title</title>
+
+    <!-- jQuery from CDN -->
+</head>
+<body>
+    <div class="container">
+        @RenderBody()
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.4/signalr.min.js"></script>
+    <script type="text/javascript">
+        // Initialize SignalR connection
+        const connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+        // Handle incoming notifications
+        connection.on("ReceiveNotification", (title, message, createdDate) => {
+            // Display the notification as an alert
+            alert(`New Notification: ${title}\n${message}\n${new Date(createdDate).toLocaleString()}`);
+        });
+
+        // Start the connection
+        connection.start().catch(err => console.error(err.toString()));
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

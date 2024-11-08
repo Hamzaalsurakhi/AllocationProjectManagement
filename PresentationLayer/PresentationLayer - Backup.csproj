@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\Admin\**" />
+    <Content Remove="Views\Admin\**" />
+    <EmbeddedResource Remove="Views\Admin\**" />
+    <None Remove="Views\Admin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.Designer.cs" />
+    <Content Remove="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.xsc" />
+    <Content Remove="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.xsd" />
+    <Content Remove="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.xss" />
+    <Content Remove="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeReport.rdlc" />
+    <Content Remove="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.cs" />
+    <Content Remove="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.Designer.cs" />
+    <Content Remove="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.xsc" />
+    <Content Remove="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.xsd" />
+    <Content Remove="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.xss" />
+    <Content Remove="wwwroot\RDLCReport\RDLCProjectReport\ProjectReport.rdlc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.Designer.cs">
+      <DependentUpon>EmployeeDataSet.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.cs" />
+    <Compile Include="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.Designer.cs">
+      <DependentUpon>ProjectDataSet.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Employee\Add.cshtml" />
+    <None Include="Views\Employee\Index.cshtml" />
+    <None Include="Views\Employee\Edit.cshtml" />
+    <None Include="Views\Project\Create.cshtml" />
+    <None Include="Views\Project\Index.cshtml" />
+    <None Include="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.xsc" />
+    <None Include="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.xsd">
+      <SubType>Designer</SubType>
+      <LastGenOutput>EmployeeDataSet.Designer.cs</LastGenOutput>
+      <Generator>MSDataSetGenerator</Generator>
+    </None>
+    <None Include="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeDataSet.xss" />
+    <None Include="wwwroot\RDLCReport\RDLCEmployeeReport\EmployeeReport.rdlc" />
+    <None Include="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.xsc" />
+    <None Include="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.xsd">
+      <SubType>Designer</SubType>
+      <LastGenOutput>ProjectDataSet.Designer.cs</LastGenOutput>
+      <Generator>MSDataSetGenerator</Generator>
+    </None>
+    <None Include="wwwroot\RDLCReport\RDLCProjectReport\ProjectDataSet.xss" />
+    <None Include="wwwroot\RDLCReport\RDLCProjectReport\ProjectReport.rdlc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.Reporting" Version="2.1.0" />
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.20">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.20" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
+    <ProjectReference Include="..\DataLayer\DataLayer.csproj" />
+  </ItemGroup>
+
+</Project>

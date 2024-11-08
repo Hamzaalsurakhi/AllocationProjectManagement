@@ -1,0 +1,177 @@
+﻿@model PresentationLayer.ViewModels.EmployeeViewModel
+@{
+    ViewBag.Title = "Add Employee";
+
+}
+<link href="~/startbootstrap-sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+<link href="~/css/ProfileCSS.css" rel="stylesheet" />
+<link href="~/css/ProjectColor.css" rel="stylesheet" />
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-10">
+            <div class="card  mb-4">
+                <div class="card-body p-5">
+                    <h2 class="text-capitalize text-center mb-4">Create an Employee</h2>
+                    <form asp-action="Add" class="p-3" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="form-label">First Name</label>
+                                    <input asp-for="FirstName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="MidName" class="form-label">Second Name</label>
+                                    <input asp-for="MidName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="MidName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="FourthName" class="form-label">Third Name</label>
+                                    <input asp-for="FourthName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="FourthName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="form-label">Last Name</label>
+                                    <input asp-for="LastName" class="form-control form-control-sm" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="Gender" class="form-label"></label>
+                                    <select asp-for="Gender" class="form-control">
+                                        <option value="">-Select Gender-</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-lg-6 col-12 mb-3">
+                                <label class="form-label" asp-for="Photo">Profile Picture:</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" accept="image/*" asp-for="Photo" id="photoInput">
+                                    <label class="custom-file-label" for="photoInput" id="photoLabel">Choose file</label>
+                                </div>
+                                <span class="form-text text-danger" asp-validation-for="Photo"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input asp-for="Email" class="form-control form-control-sm" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="Address" class="form-label"></label>
+                                    <input asp-for="Address" class="form-control form-control-sm" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                    <input asp-for="PhoneNumber" class="form-control form-control-sm" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="PositionId" class="form-label">Employee Position</label>
+                                    <select asp-for="PositionId" class="form-control form-control-sm" asp-items="Model.Positions">
+                                        <option value="">-Select Position-</option>
+                                    </select>
+                                    <span asp-validation-for="PositionId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="LevelId" class="form-label">Employee Level</label>
+                                    <select asp-for="LevelId" class="form-control form-control-sm" asp-items="Model.Levels">
+                                        <option value="">-Select Level Of Experience-</option>
+                                    </select>
+                                    <span asp-validation-for="LevelId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label asp-for="TeamCountryId" class="form-label">Team Country</label>
+                                    <select asp-for="TeamCountryId" class="form-control form-control-sm" asp-items="Model.TeamCountries">
+                                        <option value="">-Select Team Country-</option>
+                                    </select>
+                                    <span asp-validation-for="TeamCountryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group text-center mb-3 mt-5">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+                                <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        @if (TempData["SuccessCreateEmp"] != null)
+            {
+            <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["SuccessCreateEmp"]',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            }).then((result) => {
+                window.location.href = '@Url.Action("Index", "Employee")';
+            });
+            </script>
+            }
+        <script>
+            document.getElementById('photoInput').addEventListener('change', function () {
+                var fileName = this.files[0].name;
+                var nextSibling = this.nextElementSibling;
+                nextSibling.innerText = fileName;
+            });
+
+            window.onload = function () {
+                document.querySelector("form").reset();
+            };
+        </script>
+    }
+
+}
+
+
+

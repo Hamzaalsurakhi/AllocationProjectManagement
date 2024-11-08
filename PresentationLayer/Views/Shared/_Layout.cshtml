@@ -1,0 +1,389 @@
+﻿@{
+    var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>@ViewBag.Title</title>
+    <link href="~/startbootstrap-sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="~/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" /><!-- SweetAlert2 CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link href="~/css/ProjectColor.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+    <!-- Topbar -->
+    <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow p-1">
+        <!-- Logo -->
+        @if (await userManager.IsInRoleAsync(user, "Project Delivery Manager"))
+        {
+            <a class="navbar-brand m-0 d-flex justify-content-center align-items-center " style="width:224px" asp-action="Dashboard" asp-controller="Home">
+
+                <img src="~/File/assets/TPS-logo.png" alt="TPS Logo" class="img-fluid" style="max-height: 60px;">
+            </a>
+        }
+        else
+        @if (await userManager.IsInRoleAsync(user, "HR Officer"))
+        {
+            <a class="navbar-brand m-0 d-flex justify-content-center align-items-center " style="width:224px" asp-action="Index" asp-controller="Employee">
+
+                <img src="~/File/assets/TPS-logo.png" alt="TPS Logo" class="img-fluid" style="max-height: 60px;">
+            </a>
+        }
+
+        <!-- Topbar Navbar -->
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item d-flex align-items-center">
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle d-flex justify-content-center align-items-center mr-3">
+                    <i class="fa fa-bars" style="color: #4400ee "></i>
+                </button>
+            </li>
+
+            <!-- Dropdown - Alerts -->
+            @if (await userManager.IsInRoleAsync(user, "Project Delivery Manager"))
+            {
+                <li class="nav-item dropdown no-arrow">
+                    <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell fa-fw"></i>
+                        <!-- Counter - Alerts -->
+                        <span id="notificationBadge" class="badge badge-danger badge-counter"></span>
+                    </a>
+                    <!-- Dropdown - Alerts -->
+                    <div id="notificationDropdown" class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                        <h6 class="dropdown-header">
+                            Alerts Center
+                        </h6>
+                        <!-- Notifications will be dynamically inserted here -->
+                        <!-- Predefined "Show All Alerts" link -->
+                        <a id="showAllAlertsLink" class="dropdown-item text-center small text-gray-500" href="/Home/Notifications">
+                            Show All Alerts
+                        </a>
+                    </div>
+                </li>
+            }
+
+            <div class="topbar-divider d-none d-sm-block"></div>
+
+            <!-- Dropdown - User Information -->
+            <li class="nav-item dropdown">
+                <a class="nav-link cursor-pointer gap-2 d-flex justify-content-between align-items-center" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (string.IsNullOrEmpty(user.PhotoUrl))
+                    {
+                        if (user.Gender == "male")
+                        {
+                            <img class="img-profile rounded-circle" src="~/File/assets/UserMale.png" alt="Profile Picture" style="max-height: 40px;">
+                        }
+                        else
+                            if (user.Gender == "female")
+                        {
+                            <img class="img-profile rounded-circle" src="~/File/assets/UserFemale.png" alt="Profile Picture" style="max-height: 40px;">
+                        }
+                    }
+                    else
+                    {
+                        <img class="img-profile rounded-circle" src="~/File/@user.PhotoUrl" alt="Profile Picture" style="max-height: 40px;">
+                    }
+                    <span class="me-3 d-none d-lg-inline text-gray-600 small" style="margin-left:7px">@user.Fname</span>
+
+                </a>
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                    <a class="dropdown-item" asp-action="Profile" asp-controller="Home">
+                        <i class="fas fa-user fa-sm fa-fw me-2" style="color: #b1cfef;"></i>
+                        Profile
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 " style="color: #b1cfef;"></i>
+                        Logout
+                    </a>
+                </div>
+            </li>
+
+        </ul>
+    </nav>
+    <!-- End of Topbar -->
+    <!-- Page Wrapper -->
+    <div id="wrapper" class="d-flex fw-bold flex-nowrap">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            @{
+                if (await userManager.IsInRoleAsync(user, "Project Delivery Manager"))
+                {
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-action="Dashboard" asp-controller="Home">
+                            <div class="sidebar-heading text-start p-0">Dashboard</div>
+                        </a>
+                    </li>
+                }
+            }
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Interface
+            </div>
+
+            @if (await userManager.IsInRoleAsync(user, "Project Delivery Manager"))
+            {
+                <!-- Nav Item - Projects -->
+                <li class="nav-item fw-bold">
+                    <a class="nav-link" asp-controller="Project" asp-action="ShowProjects">
+                        <i class="fas fa-fw fa-project-diagram"></i>
+                        <span style="font-weight:bold">Projects</span>
+                    </a>
+                </li>
+                <!-- Nav Item - Allocation -->
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Index" asp-controller="Allocation">
+                        <i class="fa fa-tasks"></i>
+                        <span style="font-weight:bold">Allocations</span>
+                    </a>
+                </li>
+            }
+
+            <!-- Nav Item - Employees -->
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Employee">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span style="font-weight:bold">Employees</span>
+                </a>
+            </li>
+
+            @if (await userManager.IsInRoleAsync(user, "Project Delivery Manager"))
+            {
+                <!-- Nav Item - Netifications -->
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Notifications">
+                        <i class="fas fa-bell fa-fw"></i>
+                        <span style="font-weight:bold">Notifications</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Bench">
+                        <i class="fas fa-fw fa-chair"></i>
+                        <span style="font-weight:bold">Bench</span>
+                    </a>
+                </li>
+            }
+            <!-- Nav Item - Bench -->
+           
+            <!-- Nav Item - RDLC Report -->
+            <li class="nav-item mb-2 w-100">
+                <a class="nav-link collapsed cursor-pointer w-100" href="#" data-bs-toggle="collapse" data-bs-target="#collapseReport" aria-expanded="false" aria-controls="collapseReport">
+                    <i class="fas fa-fw fa-file"></i>
+                    <span style="font-weight:bold;color:white">Report</span>
+                    <i class="fa fa-angle-down text-end" style="color: white;z-index:100"></i>
+                </a>
+                <div id="collapseReport" class="collapse" aria-labelledby="headingReport">
+                    <div class="bg-white py-2 c collapse-inner rounded">
+                        <h6 class="collapse-header">Report Document:</h6>
+                        <a class="collapse-item" asp-controller="Report" asp-action="EmployeeReport">Employee Report</a>
+                        <a class="collapse-item" asp-controller="Report" asp-action="AllocationReport">Allocation Report</a>
+                        <a class="collapse-item" asp-controller="Report" asp-action="ProjectReport">Project Report</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <div class="sidebar-heading" style="font-weight:bold">
+                Recycle
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu for Recycle -->
+            <li class="nav-item mb-2">
+                <a class="nav-link collapsed cursor-pointer" href="#" data-bs-toggle="collapse" data-bs-target="#collapseRecovery" aria-expanded="false" aria-controls="collapseRecovery">
+                    <i class="fas fa-fw fa-recycle"></i>
+                    <span style="font-weight:bold;color:white">Recovery</span>
+                    <i class="fa fa-angle-down text-end" style="color: white;z-index:100"></i>
+                </a>
+                <div id="collapseRecovery" class="collapse" aria-labelledby="headingRecovery">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Recovery:</h6>
+
+                        @if (await userManager.IsInRoleAsync(user, "Project Delivery Manager"))
+                        {
+                            <a class="collapse-item" asp-controller="Project" asp-action="DeletedProjects">Recovery Projects</a>
+                        }
+                        else if (await userManager.IsInRoleAsync(user, "HR Officer"))
+                        {
+                            <a class="collapse-item" asp-action="DeletedEmployees" asp-controller="Employee">Recovery Employees</a>
+                        }
+                    </div>
+                </div>
+            </li>
+
+
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column flex-grow-1">
+
+            <!-- Main Content -->
+            <div id="content" class="d-flex justify-content-between flex-column flex-grow-1">
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+                <!-- End of Main Content -->
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2024</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+        </div>
+        <!-- End of Page Wrapper -->
+        <!-- Logout Modal -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                        <!-- Font Awesome Close Icon -->
+                        <button class="btn" type="button" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" asp-controller="Account" asp-action="Logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/startbootstrap-sb-admin-2/js/sb-admin-2.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        connection.on("ReceiveNotification", function (notifications) {
+            const notificationDropdown = document.getElementById("notificationDropdown");
+            const notificationBadge = document.getElementById("notificationBadge");
+
+            // Clear existing notifications, but keep the "Show All Alerts" link
+            const showAllAlertsLink = document.getElementById("showAllAlertsLink");
+            notificationDropdown.innerHTML = '<h6 class="dropdown-header">Alerts Center</h6>';
+
+            // Re-append the "Show All Alerts" link after clearing
+            notificationDropdown.appendChild(showAllAlertsLink);
+
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement("a");
+                notificationItem.className = "dropdown-item d-flex align-items-center";
+                notificationItem.href = "#";
+
+                const iconCircle = document.createElement("div");
+                iconCircle.className = "mr-3";
+                const icon = document.createElement("div");
+                icon.className = "icon-circle bg-primary";
+                icon.innerHTML = `<i class="fas fa-bell text-white"></i>`; // Customize icon based on notification type
+
+                iconCircle.appendChild(icon);
+
+                const textDiv = document.createElement("div");
+                const small = document.createElement("div");
+                small.className = "small text-gray-500";
+                small.textContent = new Date(notification.createdDate).toLocaleDateString();
+                const strong = document.createElement("span");
+                strong.className = "font-weight-bold";
+                strong.textContent = notification.message;
+
+                textDiv.appendChild(small);
+                textDiv.appendChild(strong);
+
+                notificationItem.appendChild(iconCircle);
+                notificationItem.appendChild(textDiv);
+
+                // Insert notification item before the "Show All Alerts" link
+                notificationDropdown.insertBefore(notificationItem, showAllAlertsLink);
+            });
+
+            // Update the notification badge count
+            notificationBadge.textContent = notifications.length > 0 ? notifications.length : "0";
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        async function fetchNotifications() {
+            try {
+                const response = await fetch('/Home/GetTopNotifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const notifications = await response.json();
+                    connection.invoke("ReceiveNotification", notifications);
+                } else {
+                    console.error('Failed to fetch notifications');
+                }
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        }
+
+        window.addEventListener('load', function () {
+            fetchNotifications();
+        });
+
+        connection.onclose(async () => {
+            console.log("Connection closed. Reconnecting...");
+            await connection.start();
+            fetchNotifications();
+        });
+
+    </script>
+</body>
+
+</html>

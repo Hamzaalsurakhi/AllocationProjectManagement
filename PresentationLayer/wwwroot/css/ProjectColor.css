@@ -1,0 +1,101 @@
+﻿:root {
+    --primary-color: #4400ee;
+    --info-color: #b1cfef;
+    --secondary-color: #777777;
+    --btn-text-color: #ffffff; /* Default button text color */
+}
+
+.border-left-info {
+    border-left-color: var(--primary-color) !important;
+}
+
+.topbar.navbar-light .navbar-nav .nav-item .nav-link {
+    color: var(--info-color);
+}
+
+.text-info {
+    color: var(--info-color);
+}
+
+.text-css-info {
+    color: var(--info-color);
+}
+
+.colorHover {
+    color: var(--primary-color);
+}
+
+.col-auto i {
+    color: var(--info-color);
+}
+
+.text-css-secondary {
+    color: var(--secondary-color);
+}
+
+.text-secondary {
+    color: var(--secondary-color);
+}
+
+.text-primary {
+    color: var(--primary-color);
+}
+
+.text-css-primary {
+    color: var(--primary-color);
+}
+/* Apply colors to all buttons */
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--btn-text-color) !important;
+}
+
+.bg-CSS-info {
+    background: var(--info-color) !important;
+}
+
+.bg-CSS-secondary {
+    background: var(--secondary-color) !important;
+}
+
+.btn-info {
+    background-color: var(--info-color) !important;
+    border-color: var(--info-color) !important;
+    color: var(--btn-text-color) !important;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+    color: var(--btn-text-color) !important;
+}
+
+/* Apply to all buttons generally if needed */
+.btn {
+    color: var(--btn-text-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+/* Override text color for each button variant (if needed) */
+.btn-primary:hover, .btn-primary:focus {
+    color: var(--btn-text-color) !important;
+}
+
+.btn-info:hover, .btn-info:focus {
+    color: var(--btn-text-color) !important;
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    color: var(--btn-text-color) !important;
+}
+
+.sidebar-dark .nav-item .nav-link i {
+    color: white;
+}
+
+.sidebar-dark .sidebar-heading {
+    color: white;
+}
